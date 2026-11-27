@@ -3,8 +3,8 @@
 ## Status
 - [x] Repo public, folders and files created
 - [x] VANISETU_MVP.md
-- [ ] docker compose up works
-- [ ] Home
+- [x] docker compose up works
+- [x] Home
 - [ ] Mock logic (mockAI.ts)
 - [ ] Consultation with mock turn
 - [ ] Clarifier overlay
