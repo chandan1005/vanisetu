@@ -1,49 +1,46 @@
 # VANISETU – Progress
 
 ## One line
-Voice consultation prototype: patient and doctor speak different languages; confirm risky details, teach-back, save. Solo, Round 2, Healthcare access.
+Voice consultation prototype: patient and doctor speak different languages; confirm risky details before translating, teach-back, save. Solo, Round 2, Healthcare access.
 
 ## Rules
-- Starts with no keys (scripted responses; Home shows "AI key not set").
+- Starts with no keys (Home shows "AI key not set"). No .env needed (`frontend/.env.example` documents this).
 - No diagnosis or advice. Original words always shown with "AI translation".
 - Fictional data only: "Sample Government PHC, Bengaluru (demo)", "Dr. Demo".
-- 6 screens only. No maps, GPS, login, real WhatsApp, real calls.
+- 6 screens only. No backend, database, maps, login, real WhatsApp, real calls.
 
-## Status
-- [x] Repo public, folders and files created
-- [x] VANISETU_MVP.md
-- [x] docker compose up works
-- [x] Home (starts a fresh consultation, shows key status)
-- [x] Mock logic (mockAI.ts) + test-mock.ts (8 checks pass)
-- [x] Consultation with scripted turns
-- [x] Safety check overlay (confirm before translate, Repeat)
-- [x] Unknown sentence → "Not understood. Please say it again."
-- [x] Optional Chrome microphone + type/dictate field (Wispr Flow)
-- [x] Read-aloud of translations (browser speech, free)
-- [x] Teach-back (Mismatch → Explain again → Understood)
-- [x] Summary + save to localStorage
-- [x] My Consultations + Details + replay + demo reset
-- [x] README, demo script, test plan, prompts log
-- [x] PWA manifest (installable)
-- [ ] Run docs/test-plan.md on laptop and phone
-- [ ] Test microphone in Chrome (Hindi hi-IN, English en-IN)
-- [ ] Record YouTube video (unlisted, 3 min or less)
-- [ ] Pitch deck PDF (problem/solution, users + numbers, dependencies + fallback, launch plan)
-- [ ] Fill Result column in docs/prompts-used.md
+## Status – code (done)
+- [x] Docker + nginx, one command, no keys
+- [x] Home with patient/doctor language picker (11 languages) + key and live-translation status
+- [x] Scripted demo lines (mockAI.ts) – work offline
+- [x] Live translation via Chrome built-in Translator (translator.ts), with timeouts and clear fallback
+- [x] Live safety check: dose/frequency/time/food/duration/warning chips → confirm → translate (safety.ts)
+- [x] Mic in each person's language + type/dictate field (Wispr Flow)
+- [x] Read-aloud in the listener's language
+- [x] Teach-back: scripted and live (fact comparison, "Missed" list)
+- [x] Summary + save, My Consultations, Details + replay, demo reset
+- [x] test-mock.ts: 14 checks pass
+- [x] README (Wispr Flow section, architecture, limits), docs/how-it-works.md, test plan, demo script, Wispr log, prompts log
+
+## Pending – submission
+- [ ] Copy new files into repo, delete Placeholder.tsx, rebuild, commit, push
+- [ ] Run docs/test-plan.md T01–T22 (laptop Chrome + phone)
+- [ ] Check live translation in your Chrome for your demo languages (T08–T12, T15–T16)
+- [ ] Fill docs/wispr-flow-log.md and docs/prompts-used.md with real usage only
 - [ ] Friend test: clone repo, docker compose up
-- [ ] Submit on the dashboard (once, by 30 Nov 11:59 PM; aim 29 Nov)
+- [ ] Pitch deck PDF (text, 4 required points)
+- [ ] Record video (docs/demo-script.md), upload Unlisted
+- [ ] Optional: live link (Vercel/Netlify)
+- [ ] Submit once (deadline 30 Nov 11:59 PM; aim 29 Nov)
 
-## Files
-- frontend/src/mockAI.ts – scripted logic (done)
-- frontend/src/storage.ts – localStorage (done)
-- frontend/src/speech.ts – read aloud + mic (done)
-- frontend/src/types.ts – data shapes (done)
-- frontend/src/components/PageShell.tsx – page frame (done)
-- frontend/src/pages/*.tsx – 6 screens (done)
-- frontend/test-mock.ts – logic checks (done)
+## Fixes (27 Nov evening)
+- [x] "Requires a user gesture" error: language packs now start downloading on button taps; added "Prepare languages" panel with progress
+- [x] Direct pair not supported → translates through English automatically
+- [x] Demo lines now shown and read in the listener's chosen language when ready (English otherwise)
+- [x] Failed live sentences are labelled "live", not "demo"
 
-## Next task
-Run the manual test plan, then record the video.
+- [x] Listening could stay stuck: added ■ Stop listening, auto-stop after a pause or 12 s
+- [x] One big "Tap and speak" button with automatic turns (patient → doctor → patient); patient never chooses a language
 
 ## Last session
-All 6 screens built and connected. Full flow tested: Home → Consultation → Safety check → Teach-back → Summary → Save → My Consultations → Details (survives page refresh).
+Added language picker, live on-device translation, live safety check and live teach-back, Wispr Flow docs. Scripted and live flows tested end to end.

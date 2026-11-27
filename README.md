@@ -6,12 +6,13 @@ VANISETU is a voice-first consultation safety prototype for Indian hospitals, bu
 
 A patient and a doctor who speak different languages talk through one phone or laptop. VANISETU:
 
-- shows the patient's original words next to an **AI translation**,
-- **confirms risky details before translating** (for example "2 tablets at one time, or 2 times daily?"),
+- lets each person speak in **their own language** (11 options: English, Hindi, Kannada, Tamil, Telugu, Bengali, Marathi, Malayalam, Gujarati, Punjabi, Odia),
+- shows the original words next to an **AI translation**,
+- **confirms risky details before translating** (dose, how often, how long, warnings),
 - runs a **teach-back check**: the patient repeats the instruction, and the app shows **Mismatch** or **Understood**,
-- saves each consultation and lets you **replay** the summary and instructions aloud.
+- saves each consultation and **replays** the summary and instructions aloud.
 
-> This is a prototype. Translations are **scripted (mock) responses** and all data is **fictional**. VANISETU does not diagnose or give medical advice. It only carries what people said.
+> Prototype: all data is **fictional**. VANISETU does not diagnose or give medical advice. It only carries what people said.
 
 ## Run it (no keys needed)
 
@@ -21,11 +22,9 @@ Requirements: Docker Desktop running.
 docker compose up --build
 ```
 
-Open **http://localhost:5173**.
+Open **http://localhost:5173**. No `.env` file or API keys are needed (see `frontend/.env.example`).
 
-The app starts without any API keys. The Home screen shows "AI key not set: using scripted responses".
-
-### Without Docker
+Without Docker:
 
 ```bash
 cd frontend
@@ -33,66 +32,72 @@ npm install
 npm run dev
 ```
 
-Open the URL printed in the terminal.
+## How we used Wispr Flow
 
-## Demo flow (2 minutes)
+- **Building:** we used Wispr Flow to dictate product specs, prompts for our AI coding assistants, and documentation (see `docs/wispr-flow-log.md`).
+- **Inside the app:** the doctor can dictate instructions with Wispr Flow into the **"Type or dictate a sentence"** field. Tapping **Send as doctor** runs VANISETU's safety check on the dictated sentence.
+- **Patient side:** uses the browser's free speech recognition, so it works on any Chrome device with no setup.
 
-1. Home → **Start Consultation**.
-2. **Patient: Hold to speak** → "Mujhe teen din se bukhar hai" → AI translation "I have had fever for three days".
-3. **Doctor: Hold to speak** → "Take two tablets after food" → the **Safety check** popup asks "2 tablets at one time" or "2 times daily". Choose **2 times daily**.
-4. **Check understanding** → **Ask patient to repeat** → patient says "One tablet at night" → **⚠ Mismatch**.
-5. **Explain again** → **Patient repeats** → "Twice a day, after food" → **✓ Understood**.
-6. **Continue to Summary** → **Save consultation** → **View My Consultations** → **View** → **Replay instructions**.
+Wispr helps capture what was said. VANISETU helps make sure it was understood.
 
-## Voice features (free, browser-only)
+## Two ways VANISETU translates
 
-- **Read aloud:** translations and replays use the browser's built-in speech synthesis.
-- **Microphone (optional):** in Chrome, "Patient mic" and "Doctor mic" use the browser's speech recognition. Unknown sentences show "Not understood. Please say it again." (the app never guesses).
-- **Type or dictate:** the text field works with Wispr Flow dictation.
-- If a voice is not available on the device, the app shows text and reports "Audio not available on this device".
+| Mode | When it is used | Needs |
+|---|---|---|
+| **Demo lines (scripted)** | The two "Hold to speak" demo buttons | Nothing; works offline |
+| **Live translation** | Real speech from the mic buttons, or any typed/dictated sentence | Recent desktop Chrome with its built-in, on-device Translator (free, no key). Language packs download on first use |
+
+If live translation is not available (other browsers, unsupported language pair, or a pack still downloading), the app shows the original words with a clear message and the demo lines keep working.
+
+## Architecture (Round 2)
+
+```
+Patient / Doctor voice
+   │  (browser speech recognition, or Wispr Flow dictation into the text field)
+   ▼
+React app in the browser
+   ├─ mockAI.ts      scripted demo lines, safety question, teach-back
+   ├─ translator.ts  live on-device translation (Chrome Translator)
+   ├─ safety.ts      finds dose / frequency / duration / warnings; compares teach-back answers
+   ├─ speech.ts      mic + read-aloud (browser, free)
+   └─ storage.ts     consultation history in localStorage
+```
+
+No backend and no database in Round 2, by design: the prototype must start with no keys and stay reliable in a live demo. Next phase: FastAPI backend, PostgreSQL/Supabase, medical-grade speech and translation services, behind the same screens.
 
 ## Screens
 
-1. Home
+1. Home (choose patient and doctor languages)
 2. Consultation (with the Safety check overlay)
 3. Teach-back
 4. Summary
 5. My Consultations
 6. Consultation Details
 
-## Project structure
-
-```
-docker-compose.yml        one-command start
-frontend/
-  Dockerfile, nginx.conf  build and serve
-  test-mock.ts            checks for the scripted logic (npx tsx test-mock.ts)
-  src/
-    mockAI.ts             scripted translation, safety check, teach-back
-    storage.ts            saves consultations in localStorage
-    speech.ts             browser read-aloud and microphone
-    types.ts              data shapes
-    components/PageShell.tsx
-    pages/                Home, Consultation, TeachBack, Summary, History, Details
-docs/                     demo script, test plan, prompts log
-```
+Full walkthrough of every flow: `docs/how-it-works.md`.
 
 ## Tests
 
 ```bash
 cd frontend
-npx tsx test-mock.ts
+npx tsx test-mock.ts     # 14 automatic checks
 ```
 
 Manual test cases: `docs/test-plan.md`.
 
-## Roadmap (not built in Round 2)
+## Known limits (stated honestly)
 
-Live AI translation engine, Medication Guardian (three-question check), missed-call replay on basic phones, WhatsApp voice notes, Care Circle (family updates), Voice Health Passport.
+- Demo lines are scripted. Live translation quality depends on Chrome's on-device models and may be imperfect, which is why VANISETU confirms risky details and checks understanding.
+- Speech recognition and voices vary by device; Odia may not be supported on every device.
+- Data stays in this browser on this device only.
+
+## Roadmap
+
+Medication Guardian (three-question check), missed-call replay on basic phones, WhatsApp voice notes, Care Circle (family updates), Voice Health Passport, backend and clinic dashboards.
 
 ## Built with
 
-React, Vite, TypeScript, Tailwind CSS, Docker. Built solo with AI coding assistants; prompts dictated with **Wispr Flow** (see `docs/prompts-used.md`).
+React, Vite, TypeScript, Tailwind CSS, Docker, browser speech and translation APIs, Wispr Flow (dictation), AI coding assistants.
 
 ## Problem evidence
 

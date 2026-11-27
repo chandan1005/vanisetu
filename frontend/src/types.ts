@@ -5,6 +5,7 @@ export type Turn = {
   original: string;
   translation: string;
   confirmed?: boolean;
+  live?: boolean;
   time: string;
 };
 
@@ -23,6 +24,9 @@ export type Consultation = {
   time: string;
   patientLanguage: string;
   doctorLanguage: string;
+  patientLang?: string;
+  doctorLang?: string;
+  liveFacts?: string[];
   symptoms: string[];
   instructions: string[];
   expectedUnderstanding: string;

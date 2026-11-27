@@ -10,7 +10,7 @@ VANISETU helps patients and doctors communicate safely through voice. It confirm
 Home → Consultation → Safety check → Teach-back → Summary → Save → My Consultations → Details
 
 ## 4. Screens (6)
-1. Home – Start Consultation, My Consultations
+1. Home – choose patient and doctor languages, Start Consultation, My Consultations
 2. Consultation – speak buttons, original and translated text, Safety check overlay
 3. Teach-back – expected vs patient answer, Mismatch or Understood
 4. Summary – facility, date, time, symptoms, instructions, status, Save
@@ -25,8 +25,11 @@ Home → Consultation → Safety check → Teach-back → Summary → Save → M
 5. Explain again → patient repeats "Twice a day, after food" → Understood
 6. Save → appears in My Consultations → replay instructions
 
+## 5b. Live mode
+Real speech (mic) or Wispr Flow dictation is translated on-device by Chrome. Doctor sentences with dose, frequency, timing, duration or warnings go through the Safety check (chips + confirm). Teach-back compares the patient's answer with the confirmed details.
+
 ## 6. Out of scope for Round 2
-Live AI engine, Medication Guardian, Care Circle, Voice Health Passport, missed-call replay, real WhatsApp, real phone calls, GPS, maps, login, notifications, emergency features.
+Backend and database, medical-grade AI services, Medication Guardian, Care Circle, Voice Health Passport, missed-call replay, real WhatsApp, real phone calls, GPS, maps, login, notifications, emergency features.
 
 ## 7. Data shape
 See `frontend/src/types.ts` (Consultation, Turn, TeachBackResult).

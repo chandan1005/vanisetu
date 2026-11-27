@@ -66,7 +66,7 @@ export default function Summary() {
         </p>
       )}
 
-      <p className="text-xs text-slate-500">AI translations are scripted for this demo. No diagnosis or medical advice is given.</p>
+      <p className="text-xs text-slate-500">Translations are AI-generated (scripted demo lines or on-device live translation). No diagnosis or medical advice is given.</p>
 
       {!saved ? (
         <button onClick={save} className="min-h-[56px] w-full rounded-2xl bg-teal-600 text-white text-lg font-semibold hover:bg-teal-700">

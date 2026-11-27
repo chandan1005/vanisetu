@@ -1,6 +1,7 @@
 // storage.ts
 // Saves consultations in the browser (localStorage). No server, no account.
 import type { Consultation } from "./types";
+import { findLanguage } from "./languages";
 
 const LIST_KEY = "vanisetu.consultations";
 const CURRENT_KEY = "vanisetu.current";
@@ -68,16 +69,20 @@ export function clearCurrent(): void {
 }
 
 // Creates an empty consultation with the fictional demo details.
-export function newConsultation(): Consultation {
+export function newConsultation(patientLang = "hi", doctorLang = "en"): Consultation {
   const now = new Date();
+  const p = findLanguage(patientLang);
+  const d = findLanguage(doctorLang);
   return {
     id: "draft",
     facility: "Sample Government PHC, Bengaluru (demo)",
     doctor: "Dr. Demo",
     date: now.toISOString().slice(0, 10),
     time: now.toTimeString().slice(0, 5),
-    patientLanguage: "Odia",
-    doctorLanguage: "Kannada",
+    patientLanguage: p.name,
+    doctorLanguage: d.name,
+    patientLang: p.code,
+    doctorLang: d.code,
     symptoms: [],
     instructions: [],
     expectedUnderstanding: "",

@@ -1,6 +1,6 @@
 # Prompts used (AI-assisted build log)
 
-All prompts dictated with Wispr Flow where possible. Fill in the Result column.
+Prompts sent to AI coding assistants while building. Mark which ones you dictated with Wispr Flow, and fill in the Result column.
 
 | # | Tool | Purpose | Date | Result |
 |---|---|---|---|---|
@@ -15,3 +15,4 @@ All prompts dictated with Wispr Flow where possible. Fill in the Result column.
 | 8 | Claude | Summary + storage | | |
 | 9 | Claude | My Consultations + Details | | |
 | 10 | Claude | Connect flow, mic, read-aloud, docs | | |
+| 11 | Claude | Language picker, live translation, live safety check, Wispr Flow docs | | |
