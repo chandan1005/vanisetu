@@ -5,10 +5,8 @@
 - [x] VANISETU_MVP.md
 - [x] docker compose up works
 - [x] Home
-- [ ] Mock logic (mockAI.ts)
-- [ ] Consultation with mock turn
-- [ ] Clarifier overlay
-- [ ] Teach-back
+- [x] Clarifier overlay
+- [x] Teach-back
 - [ ] Summary + save
 - [ ] My Consultations + Details
 - [ ] Video
