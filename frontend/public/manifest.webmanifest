@@ -1,0 +1,9 @@
+{
+  "name": "VANISETU",
+  "short_name": "VANISETU",
+  "description": "Voice-first consultation safety prototype. No Patient Lost in Translation.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f766e"
+}

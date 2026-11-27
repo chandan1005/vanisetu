@@ -1,26 +1,21 @@
-import {
-  matchUtterance,
-  needsClarification,
-  checkTeachBack,
-  translateToPatient,
-  reExplain,
-  hasKey,
-} from "./src/mockAI";
+// Quick checks for the scripted logic. Run: npx tsx test-mock.ts
+import { matchUtterance, needsClarification, checkTeachBack, translateToPatient, reExplain, hasKey } from "./src/mockAI";
 
-console.log("1. matchUtterance:", matchUtterance("Take two tablets after food"));
-// Expect: translation "Take two tablets after food", flags ["dose"]
+const checks: [string, boolean][] = [
+  ["matchUtterance flags dose", matchUtterance("Take two tablets after food").flags.includes("dose")],
+  ["unknown sentence is unclear", matchUtterance("hello there").flags.includes("unclear")],
+  ["clarifier needed for dose", needsClarification(["dose"]).needed],
+  ["teach-back mismatch", checkTeachBack("twice daily", "One tablet at night").status === "Mismatch"],
+  ["teach-back understood", checkTeachBack("twice daily", "Twice a day, after food").status === "Understood"],
+  ["translate 2 times daily", translateToPatient("2 times daily") === "Take one tablet two times a day, after food"],
+  ["re-explain twice daily", reExplain("twice daily").includes("morning")],
+  ["no key used", hasKey() === false],
+];
 
-console.log("2. needsClarification:", needsClarification(["dose"]));
-// Expect: needed true, options ["2 tablets at one time", "2 times daily"]
-
-console.log("3. checkTeachBack:", checkTeachBack("twice daily", "One tablet at night"));
-// Expect: status "Mismatch", missed "twice daily"
-
-console.log("4. translateToPatient:", translateToPatient("2 times daily"));
-// Expect: "Take one tablet two times a day, after food"
-
-console.log("5. reExplain:", reExplain("twice daily"));
-// Expect: "One tablet in the morning and one at night, after food"
-
-console.log("6. hasKey:", hasKey());
-// Expect: false
+let failed = 0;
+for (const [name, ok] of checks) {
+  console.log(`${ok ? "PASS" : "FAIL"}  ${name}`);
+  if (!ok) failed++;
+}
+console.log(failed ? `${failed} check(s) failed` : "All checks passed");
+process.exit(failed ? 1 : 0);

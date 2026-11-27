@@ -1,12 +1,13 @@
 {
   "name": "vanisetu",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test:mock": "npx tsx test-mock.ts"
   },
   "dependencies": {
     "react": "^18.3.1",
