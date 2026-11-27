@@ -10,6 +10,9 @@
 | T06 | Demo | Choose 2 times daily | Confirmed translation + "Confirmed: 2 times daily" | |
 | T07 | Demo | Doctor speak → Repeat | Popup closes, nothing added | |
 | T07b | Live | Choose Kannada patient, Telugu doctor → Consultation → Prepare languages | All pairs show "ready" (first time may take a minute) | |
+| T07c | Auto | Home: Patient "Detect automatically", Doctor English → type "ನನಗೆ ಎರಡು ದಿನದಿಂದ ಜ್ವರ ಇದೆ" → Send (auto-detect) | "Patient language detected: Kannada"; translated to English; read aloud | |
+| T07d | Auto | Type an English instruction → Send (auto-detect) | Treated as doctor; safety check chips; translated to Kannada | |
+| T07e | Auto | Type a Telugu sentence → Send (auto-detect) | "Patient language detected: Telugu"; next replies in Telugu | |
 | T08 | Live | Type "I have headache since yesterday" → Send as patient | Live bubble with translation (or clear "Not translated" message if unavailable) | |
 | T09 | Live/Wispr | Dictate with Wispr Flow "Take one tablet twice daily after food for five days" → Send as doctor | Safety check with chips: dose 1 tablet, 2 times a day, after food, 5 days | |
 | T10 | Live | Yes, these are correct | Translated into patient language, "Confirmed: …" line | |

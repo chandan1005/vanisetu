@@ -42,5 +42,17 @@ Voice consultation prototype: patient and doctor speak different languages; conf
 - [x] Listening could stay stuck: added ■ Stop listening, auto-stop after a pause or 12 s
 - [x] One big "Tap and speak" button with automatic turns (patient → doctor → patient); patient never chooses a language
 
+- [x] Automatic language detection (Indian scripts offline + Chrome Language Detector) and automatic speaker detection (doctor's language = doctor, other = patient)
+- [x] Patient language defaults to "Detect automatically"; switches when the patient changes language; replies in that language
+- [x] "Prepare … and translate" retry button when a new language pack needs a tap
+
+## Fixes from Claude in Chrome test report
+- [x] Step 6 FAIL: teach-back now accepts everyday wording ("morning and night", "two times", "both together") and answers in other languages (translated first)
+- [x] "Prepare languages" button no longer shown mid-page: replaced by a small collapsible "Translation ready ✓ / Preparing translation…" line
+- [x] Replay buttons show "🔊 Playing…" with the text and a ■ Stop button; voice stops when leaving the page
+- [x] "Mismatch" badge renamed "Needs re-explaining" with a one-line explanation (Summary, My Consultations, Details)
+- [x] "Send as patient / doctor" are now full-size buttons
+- [x] Home: technical "AI key not set" moved into "About this demo"; plain wording on the main screen
+
 ## Last session
 Added language picker, live on-device translation, live safety check and live teach-back, Wispr Flow docs. Scripted and live flows tested end to end.

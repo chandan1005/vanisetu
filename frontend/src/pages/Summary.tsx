@@ -3,12 +3,7 @@ import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
 import { clearCurrent, getCurrent, saveConsultation } from "../storage";
 import type { Consultation } from "../types";
-
-const statusStyle: Record<Consultation["status"], string> = {
-  Verified: "bg-green-100 text-green-800",
-  Mismatch: "bg-orange-100 text-orange-800",
-  "Not checked": "bg-slate-100 text-slate-700",
-};
+import { STATUS_INFO } from "../statusInfo";
 
 export default function Summary() {
   const [current] = useState(getCurrent);
@@ -58,8 +53,9 @@ export default function Summary() {
 
       <section className="flex items-center gap-3">
         <h2 className="font-semibold text-blue-900">Understanding</h2>
-        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${statusStyle[current.status]}`}>{current.status}</span>
+        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${STATUS_INFO[current.status].badge}`}>{STATUS_INFO[current.status].label}</span>
       </section>
+      <p className="text-sm text-slate-700">{STATUS_INFO[current.status].help}</p>
       {current.teachBack.status !== "Not checked" && (
         <p className="text-sm text-slate-600">
           Last answer: “{current.teachBack.patient}” after {current.teachBack.attempts} attempt(s)

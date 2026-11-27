@@ -6,7 +6,8 @@ VANISETU is a voice-first consultation safety prototype for Indian hospitals, bu
 
 A patient and a doctor who speak different languages talk through one phone or laptop. VANISETU:
 
-- lets each person speak in **their own language** (11 options: English, Hindi, Kannada, Tamil, Telugu, Bengali, Marathi, Malayalam, Gujarati, Punjabi, Odia),
+- **detects which language was spoken and who spoke** (doctor's language = doctor, any other = patient), across 11 languages: English, Hindi, Kannada, Tamil, Telugu, Bengali, Marathi, Malayalam, Gujarati, Punjabi, Odia; the patient never has to choose,
+- replies to each person **in their own language**, on screen and aloud,
 - shows the original words next to an **AI translation**,
 - **confirms risky details before translating** (dose, how often, how long, warnings),
 - runs a **teach-back check**: the patient repeats the instruction, and the app shows **Mismatch** or **Understood**,
@@ -57,6 +58,7 @@ Patient / Doctor voice
    ▼
 React app in the browser
    ├─ mockAI.ts      scripted demo lines, safety question, teach-back
+   ├─ detector.ts    detects the language (Indian scripts offline + Chrome Language Detector)
    ├─ translator.ts  live on-device translation (Chrome Translator)
    ├─ safety.ts      finds dose / frequency / duration / warnings; compares teach-back answers
    ├─ speech.ts      mic + read-aloud (browser, free)

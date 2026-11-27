@@ -7,6 +7,7 @@ import { canListen, speakText, startListening, type Listening } from "../speech"
 import { findLanguage } from "../languages";
 import { translateText, warmUp } from "../translator";
 import { compareFacts, extractFacts } from "../safety";
+import { detectLanguage } from "../detector";
 
 export default function TeachBack() {
   const navigate = useNavigate();
@@ -54,7 +55,9 @@ export default function TeachBack() {
     let gaps: string[];
     if (isLive) {
       try {
-        const english = await translateText(said, patient.code, "en");
+        const found = await detectLanguage(said, patient.code === "mr" ? "mr" : "hi");
+        const from = found.sure && found.code ? found.code : patient.code;
+        const english = await translateText(said, from, "en");
         const check = compareFacts(expectedFacts, extractFacts(english));
         status = check.status;
         gaps = check.missing;
@@ -63,7 +66,17 @@ export default function TeachBack() {
         return;
       }
     } else {
-      const check = checkTeachBack(current!.expectedUnderstanding, said);
+      // Scripted instruction: understand answers in any language by translating them to English first.
+      let english = said;
+      const found = await detectLanguage(said, patient.code === "mr" ? "mr" : "hi");
+      if (found.sure && found.code && found.code !== "en") {
+        try {
+          english = await translateText(said, found.code, "en");
+        } catch {
+          english = said;
+        }
+      }
+      const check = checkTeachBack(current!.expectedUnderstanding, english);
       status = check.status;
       gaps = check.missed ? [check.missed] : [];
     }

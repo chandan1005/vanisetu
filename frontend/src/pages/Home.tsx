@@ -4,10 +4,11 @@ import { hasKey } from "../mockAI";
 import { newConsultation, setCurrent } from "../storage";
 import { LANGUAGES } from "../languages";
 import { liveTranslationSupported, warmUpConsultation } from "../translator";
+import { warmUpDetector } from "../detector";
 
 export default function Home() {
   const navigate = useNavigate();
-  const [patientLang, setPatientLang] = useState("hi");
+  const [patientLang, setPatientLang] = useState("auto");
   const [doctorLang, setDoctorLang] = useState("en");
   const live = liveTranslationSupported();
 
@@ -15,7 +16,8 @@ export default function Home() {
   function start() {
     setCurrent(newConsultation(patientLang, doctorLang));
     // Start downloading language packs now: Chrome only allows this during a tap or click.
-    warmUpConsultation(patientLang, doctorLang);
+    warmUpDetector();
+    warmUpConsultation(patientLang === "auto" ? "hi" : patientLang, doctorLang);
     navigate("/consult");
   }
 
@@ -32,11 +34,12 @@ export default function Home() {
         <div className="w-full flex flex-col gap-3 text-left">
           <label className="text-sm font-semibold text-slate-700" htmlFor="patientLang">Patient speaks</label>
           <select id="patientLang" value={patientLang} onChange={(e) => setPatientLang(e.target.value)} className={select}>
+            <option value="auto">Detect automatically (recommended)</option>
             {LANGUAGES.map((l) => (
               <option key={l.code} value={l.code}>{l.name} ({l.native})</option>
             ))}
           </select>
-          <label className="text-sm font-semibold text-slate-700" htmlFor="doctorLang">Doctor speaks</label>
+          <label className="text-sm font-semibold text-slate-700" htmlFor="doctorLang">Doctor speaks (set once)</label>
           <select id="doctorLang" value={doctorLang} onChange={(e) => setDoctorLang(e.target.value)} className={select}>
             {LANGUAGES.map((l) => (
               <option key={l.code} value={l.code}>{l.name} ({l.native})</option>
@@ -59,14 +62,17 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="text-sm text-slate-600 flex flex-col gap-1">
-          <p>{hasKey() ? "AI key set" : "AI key not set: using scripted demo lines"}</p>
-          <p>
-            {live
-              ? "Live translation: available (Chrome, on-device, free)"
-              : "Live translation: not available in this browser. Demo lines still work."}
-          </p>
-        </div>
+        <p className="text-sm text-slate-600">
+          {live ? "Translation works in this browser. No account needed." : "Translation is not available in this browser. Sample lines still work."}
+        </p>
+        <details className="w-full text-left text-xs text-slate-500">
+          <summary className="cursor-pointer">About this demo</summary>
+          <ul className="mt-2 list-disc pl-5 flex flex-col gap-1">
+            <li>{hasKey() ? "AI key set." : "AI key not set: no API keys are used. Sample (scripted) lines always work offline."}</li>
+            <li>{live ? "Live translation runs on this device in Chrome (free)." : "Live translation needs recent desktop Chrome."}</li>
+            <li>All data is fictional and saved only in this browser.</li>
+          </ul>
+        </details>
 
         <p className="text-xs text-slate-500">Demo • Fictional data • No diagnosis or medical advice</p>
       </div>

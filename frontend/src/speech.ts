@@ -2,14 +2,23 @@
 // Free browser voice features. Nothing here needs an API key.
 
 // Reads text aloud with the browser's built-in voice. Returns false if not supported.
-export function speakText(text: string, lang = "en-IN"): boolean {
+export function speakText(text: string, lang = "en-IN", onEnd?: () => void): boolean {
   if (!("speechSynthesis" in window)) return false;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = lang;
   utterance.rate = 0.9;
+  if (onEnd) {
+    utterance.onend = onEnd;
+    utterance.onerror = onEnd;
+  }
   window.speechSynthesis.speak(utterance);
   return true;
+}
+
+// Stops any voice that is playing.
+export function stopSpeaking(): void {
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 }
 
 // True if this browser can turn speech into text (Chrome on Android and desktop).

@@ -49,16 +49,22 @@ export function expectedFor(clarifiedMeaning: string): string {
 }
 
 // Compares what the doctor said with what the patient repeated back.
+// Accepts everyday ways of saying the same thing ("morning and night" = twice daily).
 export function checkTeachBack(expected: string, said: string): { status: "Understood" | "Mismatch"; missed: string } {
-  const lowered = said.toLowerCase();
+  const t = said.toLowerCase();
+  const twice =
+    /\b(twice|two times|2 times|2 baar|do baar)\b/.test(t) ||
+    (/\bmorning\b/.test(t) && /\b(night|evening|bedtime)\b/.test(t));
+  const together = /\b(at one time|one time|at once|together|both)\b/.test(t);
+  const twoTablets = /\b(two|2)\s+(tablet|tablets|pill|pills)\b/.test(t) || /\bboth\b/.test(t);
+
   if (expected === "twice daily") {
-    if (lowered.includes("twice") || lowered.includes("two times")) return { status: "Understood", missed: "" };
-    if (lowered.includes("once") || lowered.includes("one tablet at night")) return { status: "Mismatch", missed: "twice daily" };
+    if (twice) return { status: "Understood", missed: "" };
+    return { status: "Mismatch", missed: "twice daily" };
   }
   if (expected === "two tablets at one time") {
-    if (lowered.includes("two tablets") && (lowered.includes("one time") || lowered.includes("together"))) {
-      return { status: "Understood", missed: "" };
-    }
+    if (twoTablets && together) return { status: "Understood", missed: "" };
+    return { status: "Mismatch", missed: "two tablets at one time" };
   }
   return { status: "Mismatch", missed: expected };
 }

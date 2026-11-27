@@ -69,9 +69,11 @@ export function clearCurrent(): void {
 }
 
 // Creates an empty consultation with the fictional demo details.
-export function newConsultation(patientLang = "hi", doctorLang = "en"): Consultation {
+export function newConsultation(patientLang = "auto", doctorLang = "en"): Consultation {
   const now = new Date();
-  const p = findLanguage(patientLang);
+  const auto = patientLang === "auto";
+  // In auto mode the patient's language is learned from their first sentence (Hindi until then).
+  const p = findLanguage(auto ? "hi" : patientLang);
   const d = findLanguage(doctorLang);
   return {
     id: "draft",
@@ -82,6 +84,7 @@ export function newConsultation(patientLang = "hi", doctorLang = "en"): Consulta
     patientLanguage: p.name,
     doctorLanguage: d.name,
     patientLang: p.code,
+    patientAuto: auto,
     doctorLang: d.code,
     symptoms: [],
     instructions: [],

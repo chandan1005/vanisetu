@@ -25,6 +25,7 @@ export type Consultation = {
   patientLanguage: string;
   doctorLanguage: string;
   patientLang?: string;
+  patientAuto?: boolean;
   doctorLang?: string;
   liveFacts?: string[];
   symptoms: string[];
