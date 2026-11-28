@@ -6,7 +6,7 @@ import { getCurrent, setCurrent } from "../storage";
 import { canListen, speakText, startListening, type Listening } from "../speech";
 import { findLanguage } from "../languages";
 import { translateText, warmUp } from "../translator";
-import { compareFacts, extractFacts } from "../safety";
+import { compareFacts, extractFacts, isOnlyYes } from "../safety";
 import { detectLanguage } from "../detector";
 
 export default function TeachBack() {
@@ -33,7 +33,10 @@ export default function TeachBack() {
 
   const isLive = current.expectedUnderstanding === "live";
   const expectedFacts = current.liveFacts ?? [];
-  const expectedLabel = isLive ? expectedFacts.filter((f) => !f.startsWith("time:")).join(", ") : current.expectedUnderstanding;
+  // Every detail that matters (dose, how often, food, duration, warnings) must be repeated.
+  const useFacts = expectedFacts.length > 0;
+  const keyFacts = expectedFacts.filter((f) => !f.startsWith("time:"));
+  const expectedLabel = useFacts ? keyFacts.map((f) => f.split(": ")[1] ?? f).join(", ") : current.expectedUnderstanding;
   const instruction = current.instructions[current.instructions.length - 1] ?? "";
   const patient = findLanguage(current.patientLang ?? "hi");
 
@@ -41,7 +44,7 @@ export default function TeachBack() {
   function save(said: string, status: "Understood" | "Mismatch", gaps: string[]) {
     const latest = getCurrent();
     if (!latest) return;
-    const totalDetails = isLive ? Math.max(1, expectedFacts.filter((f) => !f.startsWith("time:")).length) : 1;
+    const totalDetails = useFacts ? Math.max(1, keyFacts.length) : 1;
     const history = [...(latest.teachBack.history ?? []), { answer: said, status, missed: gaps }];
     setCurrent({
       ...latest,
@@ -50,34 +53,34 @@ export default function TeachBack() {
     });
   }
 
-  // Checks the patient's answer: scripted rules for demo lines, fact comparison for live speech.
+  // Checks the patient's answer. The answer is translated to English (any language works),
+  // then every key detail must be present. "Yes" or "ok" alone never counts.
   async function record(said: string) {
     setNote("");
-    let status: "Understood" | "Mismatch";
-    let gaps: string[];
-    if (isLive) {
+    let english = said;
+    const found = await detectLanguage(said, patient.code === "mr" ? "mr" : "hi");
+    if (found.code && found.code !== "en" && found.sure) {
       try {
-        const found = await detectLanguage(said, patient.code === "mr" ? "mr" : "hi");
-        const from = found.sure && found.code ? found.code : patient.code;
-        const english = await translateText(said, from, "en");
-        const check = compareFacts(expectedFacts, extractFacts(english));
-        status = check.status;
-        gaps = check.missing;
+        english = await translateText(said, found.code, "en");
       } catch {
-        setNote("Could not translate the answer. Please try again or ask staff to help.");
-        return;
-      }
-    } else {
-      // Scripted instruction: understand answers in any language by translating them to English first.
-      let english = said;
-      const found = await detectLanguage(said, patient.code === "mr" ? "mr" : "hi");
-      if (found.sure && found.code && found.code !== "en") {
-        try {
-          english = await translateText(said, found.code, "en");
-        } catch {
-          english = said;
+        if (isLive) {
+          setNote("Could not translate the answer. Please try again or ask staff to help.");
+          return;
         }
       }
+    }
+
+    let status: "Understood" | "Mismatch";
+    let gaps: string[];
+    if (isOnlyYes(said) || isOnlyYes(english)) {
+      status = "Mismatch";
+      gaps = useFacts ? keyFacts : [current!.expectedUnderstanding];
+      setNote("The patient only said “yes”. Ask them to say the instructions in their own words.");
+    } else if (useFacts) {
+      const check = compareFacts(expectedFacts, extractFacts(english));
+      status = check.status;
+      gaps = check.missing;
+    } else {
       const check = checkTeachBack(current!.expectedUnderstanding, english);
       status = check.status;
       gaps = check.missed ? [check.missed] : [];
@@ -119,10 +122,13 @@ export default function TeachBack() {
   const canAnswer = asked && (result === null || (result === "Mismatch" && explained));
 
   return (
-    <PageShell title="Teach-back" back="/consult" backLabel="Back to Consultation">
+    <PageShell title="Teach-back" back="/consult" backLabel="Back to Consultation" step={2}>
       <div className="rounded-2xl bg-blue-50 p-4">
         <p className="text-sm text-slate-600">Doctor's instruction (in {patient.name})</p>
         <p className="text-lg font-semibold text-blue-900">{instruction}</p>
+        <button onClick={() => speakText(instruction, patient.speech)} className="mt-2 min-h-[44px] rounded-2xl bg-white border-2 border-blue-700 px-4 font-semibold text-blue-800">
+          🔊 Play instruction to the patient
+        </button>
       </div>
 
       {!asked && (
@@ -182,7 +188,12 @@ export default function TeachBack() {
           <p className="text-xl font-bold text-orange-700">⚠ Mismatch</p>
           <p><span className="font-semibold">Expected:</span> {expectedLabel}</p>
           <p><span className="font-semibold">Patient:</span> {answer}</p>
-          {missed.length > 0 && <p><span className="font-semibold">Missed:</span> {missed.join(", ")}</p>}
+          {missed.length > 0 && <p><span className="font-semibold">Missed:</span> {missed.map((m) => m.split(": ")[1] ?? m).join(", ")}</p>}
+          {attempt >= 3 && (
+            <p className="rounded-xl bg-red-50 border border-red-300 p-2 text-sm text-red-800">
+              Still not understood after {attempt} tries. Use a human interpreter or a family member who speaks {patient.name}, or write the instructions down for them.
+            </p>
+          )}
           {!explained ? (
             <button onClick={explainAgain} className="min-h-[56px] w-full rounded-2xl bg-orange-600 text-white text-lg font-semibold hover:bg-orange-700">
               Explain again

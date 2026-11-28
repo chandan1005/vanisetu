@@ -7,20 +7,23 @@
 | T03 | Home | My Consultations | List opens | |
 | T04 | Demo | Patient: Hold to speak | Bubble "demo", AI translation "I have had fever for three days" | |
 | T05 | Demo | Doctor: Hold to speak | Safety check with 2 options + Repeat, no translation yet | |
-| T06 | Demo | Choose 2 times daily | Confirmed translation + "Confirmed: 2 times daily" | |
+| T06 | Demo | Choose "1 tablet, two times a day (after food)" | Confirmed translation + "Confirmed: 1 tablet, two times a day (after food)" | |
 | T07 | Demo | Doctor speak → Repeat | Popup closes, nothing added | |
 | T07b | Live | Choose Kannada patient, Telugu doctor → Consultation → Prepare languages | All pairs show "ready" (first time may take a minute) | |
-| T07c | Auto | Home: Patient "Detect automatically", Doctor English → type "ನನಗೆ ಎರಡು ದಿನದಿಂದ ಜ್ವರ ಇದೆ" → Send (auto-detect) | "Patient language detected: Kannada"; translated to English; read aloud | |
-| T07d | Auto | Type an English instruction → Send (auto-detect) | Treated as doctor; safety check chips; translated to Kannada | |
-| T07e | Auto | Type a Telugu sentence → Send (auto-detect) | "Patient language detected: Telugu"; next replies in Telugu | |
-| T08 | Live | Type "I have headache since yesterday" → Send as patient | Live bubble with translation (or clear "Not translated" message if unavailable) | |
-| T09 | Live/Wispr | Dictate with Wispr Flow "Take one tablet twice daily after food for five days" → Send as doctor | Safety check with chips: dose 1 tablet, 2 times a day, after food, 5 days | |
+| T07c | Auto | Home: Patient "Detect automatically", Doctor English → type "ನನಗೆ ಎರಡು ದಿನದಿಂದ ಜ್ವರ ಇದೆ" → Send | "Patient language detected: Kannada"; translated to English; read aloud | |
+| T07d | Auto | Type an English instruction → Send | Treated as doctor; safety check chips; translated to Kannada | |
+| T07e | Auto | Type a Telugu sentence → Send | "Patient language detected: Telugu"; next replies in Telugu | |
+| T08 | Live | Type "I have headache since yesterday" → Patient said this | Live bubble with translation (or clear "Not translated" message if unavailable) | |
+| T09 | Live/Wispr | Dictate with Wispr Flow "Take one tablet twice daily after food for five days" → Doctor said this | Safety check with chips: dose 1 tablet, 2 times a day, after food, 5 days | |
 | T10 | Live | Yes, these are correct | Translated into patient language, "Confirmed: …" line | |
-| T11 | Live | Type "Please drink water" → Send as doctor | Translated directly (no risky details) | |
+| T11 | Live | Type "Please drink water" → Doctor said this | Translated directly (no risky details) | |
 | T12 | Mic | Tap and speak (Patient, Hindi), speak a sentence | Button turns red while listening, stops by itself, text translated; next turn shows Doctor | |
 | T13 | Mic | Tap and speak, stay silent, or tap ■ Stop listening | "I didn't hear anything…" message; status back to Ready (never stuck) | |
 | T13b | Mic | Switch to doctor / patient | Next-to-speak card and listening language change | |
 | T14 | Teach-back | Demo path: Hold to speak → Explain again → Patient repeats | Mismatch, then Understood | |
+| T14b | Teach-back | Answer "haan" | Mismatch + "The patient only said yes…" | |
+| T14c | Teach-back | Answer "morning and night" (instruction 1 tablet, 2 times a day, after food) | Mismatch, Missed: 1 tablet, after food | |
+| T14d | History | First visit to My Consultations on a fresh browser | 6 sample consultations: Low, Medium, High, Not checked, Urgent | |
 | T15 | Teach-back | Live path: answer "one tablet at night" | Mismatch, Missed lists 2 times a day / after food / 5 days | |
 | T16 | Teach-back | Live: answer "one tablet morning and night after food for five days" | Understood | |
 | T17 | Summary | Continue → Save | "Saved ✓ as C00x", status Verified | |

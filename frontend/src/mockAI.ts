@@ -29,23 +29,30 @@ export function matchUtterance(text: string): { original: string; translation: s
 // A dose or a frequency is risky, so it triggers the safety question.
 export function needsClarification(flags: string[]): { needed: boolean; question: string; options: string[] } {
   if (flags.includes("dose") || flags.includes("frequency")) {
-    return { needed: true, question: "Did you mean:", options: ["2 tablets at one time", "2 times daily"] };
+    return { needed: true, question: "Doctor, please confirm what you meant:", options: ["1 tablet, two times a day (after food)", "2 tablets together, once a day (after food)"] };
   }
   return { needed: false, question: "", options: [] };
 }
 
 // Turns the confirmed meaning into the sentence the patient hears.
 export function translateToPatient(clarifiedMeaning: string): string {
-  if (clarifiedMeaning === "2 times daily") return "Take one tablet two times a day, after food";
-  if (clarifiedMeaning === "2 tablets at one time") return "Take two tablets at one time, after food";
+  if (clarifiedMeaning === "1 tablet, two times a day (after food)") return "Take one tablet two times a day, after food";
+  if (clarifiedMeaning === "2 tablets together, once a day (after food)") return "Take two tablets together, once a day, after food";
   return clarifiedMeaning;
 }
 
 // Gives the short "expected understanding" used by teach-back for each confirmed option.
 export function expectedFor(clarifiedMeaning: string): string {
-  if (clarifiedMeaning === "2 times daily") return "twice daily";
-  if (clarifiedMeaning === "2 tablets at one time") return "two tablets at one time";
+  if (clarifiedMeaning === "1 tablet, two times a day (after food)") return "twice daily";
+  if (clarifiedMeaning === "2 tablets together, once a day (after food)") return "two tablets at one time";
   return clarifiedMeaning;
+}
+
+// The details the patient must repeat for each confirmed demo option (dose, how often, food timing).
+export function factsFor(clarifiedMeaning: string): string[] {
+  if (clarifiedMeaning === "1 tablet, two times a day (after food)") return ["dose: 1 tablet", "frequency: 2 times a day", "food: after food"];
+  if (clarifiedMeaning === "2 tablets together, once a day (after food)") return ["dose: 2 tablets", "frequency: 1 time a day", "food: after food"];
+  return [];
 }
 
 // Compares what the doctor said with what the patient repeated back.
@@ -76,10 +83,10 @@ export function reExplain(expected: string): string {
   return expected;
 }
 
-// The scripted patient answers for teach-back: first try is wrong, second is right.
+// The scripted patient answers for teach-back: first try misses details, second is complete.
 export function scriptedRepeat(expected: string, attempt: number): string {
-  if (expected === "twice daily") return attempt === 0 ? "One tablet at night" : "Twice a day, after food";
-  return attempt === 0 ? "One tablet" : "Two tablets at one time, after food";
+  if (expected === "twice daily") return attempt === 0 ? "One tablet at night" : "One tablet in the morning and one at night, after food";
+  return attempt === 0 ? "Two tablets" : "Two tablets together once a day, after food";
 }
 
 // Used by the app to check whether an AI key is set. Round 2 uses no keys.

@@ -12,6 +12,12 @@ export default function Outcome({ c, saved }: { c: Consultation; saved: boolean 
 
   return (
     <div className="flex flex-col gap-4">
+      {c.urgent?.length ? (
+        <section className="rounded-2xl border-2 border-red-600 bg-red-50 p-3">
+          <p className="font-bold text-red-700">⚠ Urgent words flagged: {c.urgent.join(", ")}</p>
+          <p className="text-sm text-red-800">The doctor was alerted during the consultation. VANISETU flags words; it does not diagnose.</p>
+        </section>
+      ) : null}
       <section className="rounded-2xl border-2 border-slate-200 p-4 flex flex-col gap-2">
         <div className="flex items-center gap-2 flex-wrap">
           <h2 className="font-semibold text-blue-900">Understanding</h2>
@@ -35,7 +41,7 @@ export default function Outcome({ c, saved }: { c: Consultation; saved: boolean 
           <p className="text-sm"><span className="font-semibold">Patient said:</span> “{lastMismatch.answer}”</p>
           <p className="text-sm"><span className="font-semibold">Expected:</span> {c.teachBack.expected}</p>
           {lastMismatch.missed.length > 0 && (
-            <p className="text-sm"><span className="font-semibold">Missed:</span> {lastMismatch.missed.join(", ")}</p>
+            <p className="text-sm"><span className="font-semibold">Missed:</span> {lastMismatch.missed.map((m) => m.split(": ")[1] ?? m).join(", ")}</p>
           )}
           <p className="text-sm"><span className="font-semibold">Reason:</span> {flagReasons(lastMismatch.missed).join("; ") || "Instruction not repeated correctly"}</p>
         </section>

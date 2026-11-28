@@ -5,6 +5,7 @@ import { newConsultation, setCurrent } from "../storage";
 import { LANGUAGES } from "../languages";
 import { liveTranslationSupported, warmUpConsultation } from "../translator";
 import { warmUpDetector } from "../detector";
+import DemoBanner from "../components/DemoBanner";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="w-full max-w-[420px] flex flex-col items-center gap-6 text-center">
+        <DemoBanner />
         <div>
           <h1 className="text-4xl font-bold text-blue-900">VANISETU</h1>
           <p className="mt-2 text-lg text-slate-600">No Patient Lost in Translation</p>
@@ -71,6 +73,7 @@ export default function Home() {
             <li>{hasKey() ? "AI key set." : "Demo mode: no API keys are used (key not set). Sample lines always work offline."}</li>
             <li>{live ? "Live translation runs on this device in Chrome (free)." : "Live translation needs recent desktop Chrome."}</li>
             <li>All data is fictional and saved only in this browser.</li>
+            <li>The doctor can dictate with any dictation tool, such as Wispr Flow, into the text box.</li>
           </ul>
         </details>
 

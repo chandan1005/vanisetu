@@ -33,6 +33,7 @@ export type Consultation = {
   patientAuto?: boolean;
   doctorLang?: string;
   liveFacts?: string[];
+  urgent?: string[];
   symptoms: string[];
   instructions: string[];
   expectedUnderstanding: string;

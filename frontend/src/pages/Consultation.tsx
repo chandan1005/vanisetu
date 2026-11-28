@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageShell from "../components/PageShell";
-import { matchUtterance, needsClarification, translateToPatient, expectedFor } from "../mockAI";
+import { matchUtterance, needsClarification, translateToPatient, expectedFor, factsFor } from "../mockAI";
 import { getCurrent, newConsultation, setCurrent } from "../storage";
 import { canListen, speakText, startListening, type Listening } from "../speech";
 import { findLanguage } from "../languages";
 import { getProgress, liveTranslationSupported, onProgress, translateText, warmUp } from "../translator";
 import { detectLanguage, warmUpDetector } from "../detector";
-import { extractFacts } from "../safety";
+import { expandAbbreviations, extractFacts, urgentWords } from "../safety";
 import type { Consultation as ConsultationData, Turn } from "../types";
 
 // The scripted sentences for the demo buttons (always work, even offline).
@@ -37,6 +37,7 @@ export default function Consultation() {
   // Whose turn it is. Turns switch automatically after each sentence.
   const [turn, setTurn] = useState<Who>("patient");
   const [listening, setListening] = useState<Listening | null>(null);
+  const [urgent, setUrgent] = useState<string[]>([]);
   const live = liveTranslationSupported();
 
   // Always read the latest languages inside async code.
@@ -53,6 +54,13 @@ export default function Consultation() {
   }
 
   function addPatientTurn(original: string, translation: string, symptom: string, isLive: boolean) {
+    // Flag words that need the doctor's attention now (not a diagnosis).
+    const words = urgentWords(symptom);
+    if (words.length) {
+      setUrgent((prev) => [...new Set([...prev, ...words])]);
+      setData((prev) => ({ ...prev, urgent: [...new Set([...(prev.urgent ?? []), ...words])] }));
+      speakText(`Attention doctor: ${words.join(", ")}`, "en-IN");
+    }
     setData((prev) => ({
       ...prev,
       symptoms: symptom && !prev.symptoms.includes(symptom) ? [...prev.symptoms, symptom] : prev.symptoms,
@@ -97,14 +105,17 @@ export default function Consultation() {
   }
 
   // ---------- Live sentences (any language) ----------
-  async function handleLive(speaker: Who, text: string, from: string, to: string) {
+  async function handleLive(speaker: Who, rawText: string, from: string, to: string) {
     setStatus("Translating");
+    // Spell out prescription shorthand (OD, BD, TDS…) so the patient hears plain words.
+    const text = speaker === "doctor" && from === "en" ? expandAbbreviations(rawText) : rawText;
     try {
       const english = await translateText(text, from, "en");
       if (speaker === "doctor") {
         const facts = extractFacts(english);
         if (facts.length) {
           setPending({ kind: "live", original: text, english, facts, from, to });
+          if (text !== rawText) addTurns([{ speaker: "system", original: `Shorthand spelled out: “${rawText}” → “${text}”`, translation: "", time: nowTime() }]);
           setStatus("Waiting for safety check");
           return;
         }
@@ -244,7 +255,7 @@ export default function Consultation() {
         { speaker: "doctor", original, translation: out.text, confirmed: true, time: nowTime() },
         { speaker: "system", original: `Confirmed: ${option}`, translation: "", time: nowTime() },
       ],
-      { instructions: [out.text], expectedUnderstanding: expectedFor(option), liveFacts: [] }
+      { instructions: [out.text], expectedUnderstanding: expectedFor(option), liveFacts: factsFor(option) }
     );
     speakText(out.text, out.lang);
     setStatus("Ready");
@@ -281,7 +292,7 @@ export default function Consultation() {
   const turnLang = turn === "patient" ? patient : doctor;
 
   return (
-    <PageShell title="Consultation">
+    <PageShell title="Consultation" step={data.instructions.length ? 2 : pending ? 1 : 0}>
       <div className="rounded-2xl bg-blue-50 p-3 text-center text-blue-900">
         <p className="font-semibold">
           Patient: {patient.name} ({patient.native}){data.patientAuto ? " · detected automatically" : ""}
@@ -289,6 +300,14 @@ export default function Consultation() {
         <p className="font-semibold">Doctor: {doctor.name} ({doctor.native})</p>
         <p className="mt-1 text-sm text-slate-600" aria-live="polite">Status: {status}</p>
       </div>
+
+      {urgent.length > 0 && (
+        <div className="rounded-2xl border-2 border-red-600 bg-red-50 p-3" role="alert">
+          <p className="font-bold text-red-700">⚠ Urgent words heard: {urgent.join(", ")}</p>
+          <p className="text-sm text-red-800">Doctor, please review now. If this is an emergency outside a hospital, call 108. VANISETU does not diagnose; it only flags what was said.</p>
+          <button onClick={() => setUrgent([])} className="mt-1 text-sm text-red-700 underline">Reviewed, hide</button>
+        </div>
+      )}
 
       {/* Conversation */}
       <div className="flex flex-col gap-3 min-h-[120px]">
@@ -325,6 +344,12 @@ export default function Consultation() {
       )}
       {note && <p className="text-sm text-orange-700">{note}</p>}
 
+      {!canListen() && (
+        <p className="rounded-xl bg-slate-100 p-3 text-sm text-slate-700">
+          Voice input needs Google Chrome. In this browser you can type what was said, or use the demo lines.
+        </p>
+      )}
+
       {/* Turn-based speaking: one big button */}
       {canListen() && (
         <div className="rounded-2xl border-2 border-slate-200 p-4 flex flex-col gap-3 items-center text-center">
@@ -354,7 +379,7 @@ export default function Consultation() {
       {/* Type or dictate: language and speaker are detected automatically */}
       <div className="flex flex-col gap-2">
         <label htmlFor="typed" className="text-sm text-slate-600">
-          Type or dictate in any language (Wispr Flow works here). VANISETU detects the language and who is speaking.
+          Type or dictate what was said, in any language. VANISETU detects the language and who said it.
         </label>
         <input
           id="typed"
@@ -362,21 +387,28 @@ export default function Consultation() {
           onChange={(e) => setTyped(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendTyped()}
           className="min-h-[48px] rounded-2xl border-2 border-slate-300 px-3"
-          placeholder="e.g. ನನಗೆ ಎರಡು ದಿನದಿಂದ ಜ್ವರ ಇದೆ"
+          placeholder="Type what was said…"
         />
-        <button onClick={() => sendTyped()} disabled={busy} className="min-h-[48px] rounded-2xl bg-slate-800 text-white font-semibold disabled:opacity-50">
-          Send (auto-detect)
+        <button
+          onClick={() => sendTyped()}
+          disabled={busy || !typed.trim()}
+          className="min-h-[52px] rounded-2xl bg-slate-800 text-white text-lg font-semibold disabled:opacity-40"
+        >
+          Send
         </button>
-        <div className="flex gap-2">
-          <button onClick={() => sendTyped("patient")} disabled={busy}
-            className="flex-1 min-h-[48px] rounded-2xl border-2 border-teal-600 text-teal-700 font-semibold disabled:opacity-50">
-            Send as patient
-          </button>
-          <button onClick={() => sendTyped("doctor")} disabled={busy}
-            className="flex-1 min-h-[48px] rounded-2xl border-2 border-blue-700 text-blue-800 font-semibold disabled:opacity-50">
-            Send as doctor
-          </button>
-        </div>
+        <details className="text-sm text-slate-600">
+          <summary className="cursor-pointer">Choose the speaker yourself (for romanised text like “mujhe bukhar hai”)</summary>
+          <div className="mt-2 flex gap-2">
+            <button onClick={() => sendTyped("patient")} disabled={busy || !typed.trim()}
+              className="flex-1 min-h-[48px] rounded-2xl border-2 border-teal-600 text-teal-700 font-semibold disabled:opacity-40">
+              Patient said this
+            </button>
+            <button onClick={() => sendTyped("doctor")} disabled={busy || !typed.trim()}
+              className="flex-1 min-h-[48px] rounded-2xl border-2 border-blue-700 text-blue-800 font-semibold disabled:opacity-40">
+              Doctor said this
+            </button>
+          </div>
+        </details>
       </div>
 
       {live && patient.code !== doctor.code && (() => {
@@ -404,17 +436,20 @@ export default function Consultation() {
         );
       })()}
 
-      {/* Scripted demo lines */}
-      <p className="text-xs text-slate-500">Demo lines (scripted Hindi patient line and English doctor line; always work offline).</p>
-      <div className="flex gap-2">
-        <button onClick={() => speakDemo("patient", PATIENT_SENTENCE)} disabled={busy}
-          className="flex-1 min-h-[48px] rounded-2xl border-2 border-teal-600 text-teal-700 font-semibold disabled:opacity-50">
-          🎤 Patient: Hold to speak
-        </button>
-        <button onClick={() => speakDemo("doctor", DOCTOR_SENTENCE)} disabled={busy}
-          className="flex-1 min-h-[48px] rounded-2xl border-2 border-blue-700 text-blue-800 font-semibold disabled:opacity-50">
-          🎤 Doctor: Hold to speak
-        </button>
+      {/* Scripted demo lines, clearly separated */}
+      <div className="rounded-2xl border-2 border-dashed border-yellow-500 bg-yellow-50 p-3 flex flex-col gap-2">
+        <p className="text-xs font-bold text-yellow-900">DEMO LINES · for presentations, work offline</p>
+        <p className="text-xs text-yellow-900">Scripted Hindi patient line and English doctor line.</p>
+        <div className="flex gap-2">
+          <button onClick={() => speakDemo("patient", PATIENT_SENTENCE)} disabled={busy}
+            className="flex-1 min-h-[48px] rounded-2xl border-2 border-teal-600 bg-white text-teal-700 font-semibold disabled:opacity-50">
+            🎤 Patient: Hold to speak
+          </button>
+          <button onClick={() => speakDemo("doctor", DOCTOR_SENTENCE)} disabled={busy}
+            className="flex-1 min-h-[48px] rounded-2xl border-2 border-blue-700 bg-white text-blue-800 font-semibold disabled:opacity-50">
+            🎤 Doctor: Hold to speak
+          </button>
+        </div>
       </div>
 
       <button
@@ -424,7 +459,11 @@ export default function Consultation() {
       >
         Check understanding
       </button>
-      <button onClick={() => navigate("/summary")} className="text-teal-700 underline">Skip to summary</button>
+      {data.turns.length > 0 && (
+        <button onClick={() => navigate("/summary")} className="text-sm text-slate-600 underline">
+          Finish without checking understanding
+        </button>
+      )}
 
       {/* Safety check popup */}
       {pending && (

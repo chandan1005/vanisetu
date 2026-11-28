@@ -36,7 +36,7 @@ npm run dev
 ## How we used Wispr Flow
 
 - **Building:** we used Wispr Flow to dictate product specs, prompts for our AI coding assistants, and documentation (see `docs/wispr-flow-log.md`).
-- **Inside the app:** the doctor can dictate instructions with Wispr Flow into the **"Type or dictate a sentence"** field. Tapping **Send as doctor** runs VANISETU's safety check on the dictated sentence.
+- **Inside the app:** the doctor can dictate instructions with Wispr Flow into the **"Type or dictate a sentence"** field. Tapping **Doctor said this** runs VANISETU's safety check on the dictated sentence.
 - **Patient side:** uses the browser's free speech recognition, so it works on any Chrome device with no setup.
 
 Wispr helps capture what was said. VANISETU helps make sure it was understood.

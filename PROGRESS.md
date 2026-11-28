@@ -61,5 +61,30 @@ Voice consultation prototype: patient and doctor speak different languages; conf
 - [x] docs/pitch-slide-text.md with the "Why not Google Translate?" slide
 - [x] Feature freeze: no more features before submission (no login, backend, GPS, WhatsApp, calls, dashboards)
 
+## Fixes from the 10-reviewer audit (28 Nov)
+- [x] Language-neutral text box placeholder (no Kannada example in Hindi sessions)
+- [x] Safety check options now state dose AND frequency AND food: "1 tablet, two times a day (after food)" / "2 tablets together, once a day (after food)"; question addressed to the doctor
+- [x] "Add 3 sample consultations" (Low / Medium / High risk) on My Consultations
+- [x] PROTOTYPE banner on every screen (scripted sample lines, browser translation, fictional data, not for real care)
+- [x] "Skip to summary" replaced by "Finish without checking understanding" (only after a conversation); saving a Mismatch or Not checked record needs a tick-box acknowledgement
+- [x] One "Send" button (auto-detect); manual speaker choice tucked into a small "Choose the speaker yourself" section; Send disabled when empty
+- [x] Demo lines in a separate yellow DEMO LINES panel
+- [x] Communication risk now includes a "Next step" for the doctor
+- [x] Urgent words banner + audio alert (chest pain, breathing difficulty, fainting, seizure, heavy bleeding, allergic swelling) – flags only, no triage
+- [x] Prescription shorthand spelled out before translating (OD, BD, TDS, QID, SOS, HS); insulin "units" vs "ml" detected
+- [x] "Play instruction to the patient" button on Teach-back (audio first)
+- [x] Step indicator: Speak → Safety check → Teach-back → Summary
+- [x] docs/judge-qa.md with honest answers (no unverified statistics)
+- [ ] Not done on purpose (too big for Round 2): backend, patient IDs, multi-medicine teach-back, semantic AI teach-back, real WhatsApp/SMS
+
+## Fixes from Round 2 live review (28 Nov)
+- [x] CRITICAL: teach-back too lenient. Now every key detail is required (dose, frequency, food timing, duration, warnings) in demo and live mode; "morning and night" alone → Mismatch (Missed: 1 tablet, after food); wrong dose caught
+- [x] "Yes / haan / ok / हाँ जी" alone never passes; message asks for the instructions in the patient's own words
+- [x] After 3 failed tries: suggests interpreter, family member or written instructions
+- [x] Six realistic sample consultations (Kannada, Odia, Hindi insulin, Telugu, Tamil urgent, Hindi "yes only") auto-load on first visit to My Consultations
+- [x] Urgent signs extended (arm pain/numbness, sudden severe headache, vision problems, stroke signs, sick infant) + "call 108" hint; urgent flags saved and shown in history, summary and details
+- [x] Notice when voice input isn't available (non-Chrome browsers)
+- [x] PROTOTYPE banner now stays visible while scrolling
+
 ## Last session
 Added language picker, live on-device translation, live safety check and live teach-back, Wispr Flow docs. Scripted and live flows tested end to end.

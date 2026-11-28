@@ -9,6 +9,7 @@ import { formatDate } from "../statusInfo";
 export default function Summary() {
   const [current] = useState(getCurrent);
   const [saved, setSaved] = useState<Consultation | null>(null);
+  const [acknowledged, setAcknowledged] = useState(false);
 
   if (!current) {
     return (
@@ -26,7 +27,7 @@ export default function Summary() {
   }
 
   return (
-    <PageShell title="Summary" back="/teachback" backLabel="Back to Teach-back">
+    <PageShell title="Summary" back="/teachback" backLabel="Back to Teach-back" step={3}>
       <div className="rounded-2xl bg-blue-50 p-4 flex flex-col gap-1 text-slate-800">
         <p><span className="font-semibold">Facility:</span> {current.facility}</p>
         <p><span className="font-semibold">Doctor:</span> {current.doctor}</p>
@@ -59,9 +60,25 @@ export default function Summary() {
       <p className="text-xs text-slate-500">Translations are AI-generated (scripted demo lines or on-device live translation). No diagnosis or medical advice is given.</p>
 
       {!saved ? (
-        <button onClick={save} className="min-h-[56px] w-full rounded-2xl bg-teal-600 text-white text-lg font-semibold hover:bg-teal-700">
-          Save consultation
-        </button>
+        <>
+          {current.status !== "Verified" && (
+            <label className="flex items-start gap-2 rounded-2xl border-2 border-orange-300 bg-orange-50 p-3 text-sm text-orange-900">
+              <input type="checkbox" checked={acknowledged} onChange={(e) => setAcknowledged(e.target.checked)} className="mt-1 h-5 w-5" />
+              <span>
+                {current.status === "Mismatch"
+                  ? "The patient has not repeated the instructions correctly yet. I will explain again, and I want to save this record as “Needs re-explaining”."
+                  : "Understanding was not checked. I want to save this record as “Not checked”."}
+              </span>
+            </label>
+          )}
+          <button
+            onClick={save}
+            disabled={current.status !== "Verified" && !acknowledged}
+            className="min-h-[56px] w-full rounded-2xl bg-teal-600 text-white text-lg font-semibold hover:bg-teal-700 disabled:opacity-40"
+          >
+            Save consultation
+          </button>
+        </>
       ) : (
         <div className="flex flex-col gap-3">
           <p className="text-green-700 font-semibold">Saved ✓ as {saved.id}</p>

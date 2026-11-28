@@ -42,15 +42,15 @@ export type Risk = { level: "Low" | "Medium" | "High"; dot: string; badge: strin
 export function communicationRisk(c: Consultation): Risk {
   const tb = c.teachBack;
   if (tb.status === "Not checked") {
-    return { level: "Medium", dot: "🟡", badge: "bg-yellow-100 text-yellow-900", text: "Understanding was not checked." };
+    return { level: "Medium", dot: "🟡", badge: "bg-yellow-100 text-yellow-900", text: "Understanding was not checked. Next step: ask the patient to repeat the instructions before they leave." };
   }
   if (tb.status === "Mismatch") {
-    return { level: "High", dot: "🔴", badge: "bg-red-100 text-red-800", text: "Instructions may not have been understood. Explain again before the patient leaves." };
+    return { level: "High", dot: "🔴", badge: "bg-red-100 text-red-800", text: "Instructions may not have been understood. Next step: explain again before the patient leaves; consider a human interpreter or a family member who speaks the language." };
   }
   if (tb.attempts > 1) {
-    return { level: "Medium", dot: "🟡", badge: "bg-yellow-100 text-yellow-900", text: "Understood after re-explaining." };
+    return { level: "Medium", dot: "🟡", badge: "bg-yellow-100 text-yellow-900", text: "Understood after re-explaining. Next step: consider repeating the most important instruction once more." };
   }
-  return { level: "Low", dot: "🟢", badge: "bg-green-100 text-green-800", text: "Patient understood the instructions the first time." };
+  return { level: "Low", dot: "🟢", badge: "bg-green-100 text-green-800", text: "Patient repeated the instructions correctly the first time. No further action needed." };
 }
 
 // "3 of 4 details repeated correctly" for the last answer.

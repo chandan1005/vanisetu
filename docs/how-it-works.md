@@ -16,8 +16,8 @@ Chrome downloads a translation language pack only after a tap. On the Consultati
 Use this for the recorded video and as the backup on stage.
 The demo lines themselves are fixed: a Hindi patient sentence and an English doctor sentence. Their meaning is written in English. If languages are prepared, VANISETU shows and reads that meaning in the listener's chosen language; if not, it shows English. For a demo that matches the lines exactly, choose Hindi (patient) and English (doctor).
 1. **Patient: Hold to speak** → status Listening → Understanding → Speaking → bubble "Mujhe teen din se bukhar hai" with AI translation "I have had fever for three days". It is read aloud.
-2. **Doctor: Hold to speak** → "Take two tablets after food" contains a dose, so **no translation yet** → **Safety check** popup: "2 tablets at one time" / "2 times daily" / Repeat.
-3. Choose **2 times daily** → "AI translation (confirmed): Take one tablet two times a day, after food" + "Confirmed: 2 times daily". Read aloud to the patient.
+2. **Doctor: Hold to speak** → "Take two tablets after food" contains a dose, so **no translation yet** → **Safety check** popup: "1 tablet, two times a day (after food)" / "2 tablets together, once a day (after food)" / Repeat.
+3. Choose **1 tablet, two times a day (after food)** → "AI translation (confirmed): Take one tablet two times a day, after food" + "Confirmed: 1 tablet, two times a day (after food)". Read aloud to the patient.
 4. **Repeat** closes the popup without translating (doctor speaks again).
 
 ## Flow 3 – Live speech (real users)
@@ -30,7 +30,7 @@ VANISETU works out **who spoke** and **which language** by itself:
 Speaking uses **one big button** and **automatic turns**, so the patient (often elderly or unable to read) only has to speak.
 1. The card shows **Next to speak: 🧑 Patient · हिन्दी**. Tap **🎙 Tap and speak**. The button turns red (**■ Stop listening**). Listening stops by itself when the person stops talking, after 12 seconds, or when you tap Stop.
 2. The patient's words are translated on-device into the doctor's language, shown and read aloud. The English version is saved as a symptom. The turn passes to **🩺 Doctor** automatically.
-3. The doctor taps the same button and speaks (or dictates with Wispr Flow into the text field + **Send as doctor**). The sentence is translated to English and checked by `safety.ts`. The turn passes back to the patient.
+3. The doctor taps the same button and speaks (or dictates with Wispr Flow into the text field + **Doctor said this**). The sentence is translated to English and checked by `safety.ts`. The turn passes back to the patient.
 4. If the wrong person is shown, tap **Switch to doctor / Switch to patient**. Nobody needs to pick languages during the consultation: they were set once on Home.
    - If it has a **dose, frequency, time, food timing, duration or warning**, the **Safety check** shows the heard sentence, the English version, and orange chips such as "dose: 1 tablet", "frequency: 2 times a day", "duration: 5 days". The doctor taps **Yes, these are correct** (or **Repeat**).
    - Only then is it translated into the patient's language and read aloud.
@@ -39,7 +39,7 @@ Speaking uses **one big button** and **automatic turns**, so the patient (often 
 
 **Limits of automatic detection (say this honestly):**
 - The **microphone** must be told a language before it listens. It listens in the doctor's language on the doctor's turn and in the patient's last detected language on the patient's turn (Hindi at first). If a new patient speaks another language, the first sentence may be heard wrongly; type or dictate one sentence in their language (Wispr Flow detects many languages), and from then on the mic uses the detected language.
-- **Typed or dictated text** in any supported script is detected exactly. Romanised text ("mujhe bukhar hai") looks like English; use "Send as patient" for it.
+- **Typed or dictated text** in any supported script is detected exactly. Romanised text ("mujhe bukhar hai") looks like English; use "Patient said this" for it.
 - If a new language pack needs downloading, an orange **Prepare … and translate** button appears; one tap downloads it and translates the sentence.
 
 **Will it translate when a real user speaks?** Yes, in recent desktop Chrome with live translation available: the mic hears the language you picked, and Chrome translates on the device. On phones or other browsers, the mic may work but live translation may not; then use the demo lines.
@@ -48,7 +48,10 @@ Speaking uses **one big button** and **automatic turns**, so the patient (often 
 1. **Check understanding** (enabled after a confirmed instruction) → shows the instruction in the patient's language.
 2. **Ask patient to repeat** → the instruction is read aloud.
 3. The patient answers by **mic**, by typing/dictating, or (demo) **Patient: Hold to speak**.
-   - Demo: first answer "One tablet at night" → **⚠ Mismatch** (Expected: twice daily). Everyday wording such as "morning and night" or "two times a day" counts as correct, in any language.
+   - Every key detail must be repeated: **dose, how often, food timing, duration and warnings**. "Morning and night" counts as two times a day, but on its own it misses the dose and food timing, so it is a **Mismatch** (Missed: 1 tablet, after food).
+   - Answers like "yes", "haan", "ok" or "हाँ जी" never count. VANISETU says: *"The patient only said yes. Ask them to say the instructions in their own words."*
+   - After 3 failed tries it suggests a human interpreter, a family member, or writing the instructions down.
+   - Demo answers: "One tablet at night" → Mismatch; then "One tablet in the morning and one at night, after food" → **✓ Understood**.
    - Live: the answer is translated to English and compared with the confirmed facts. Missing facts are listed under **Missed**. "Morning and night" counts as "2 times a day".
 4. **Explain again** reads the instruction again → patient repeats → **✓ Understood**.
 5. **Continue to Summary**.
@@ -66,6 +69,16 @@ It describes understanding only, never a medical assessment. "Why VANISETU flagg
 
 ## Flow 5 – Summary and save
 Facility, doctor, date/time, language pair, symptoms, confirmed instructions, Understanding status (Verified / Mismatch / Not checked), last answer and attempts. **Save consultation** → "Saved ✓ as C001" → **View My Consultations**.
+
+## Sample consultations (for judges)
+On the first visit, **My Consultations** shows six fictional sample consultations covering every outcome:
+1. Kannada fever, understood first time → 🟢 Low
+2. Odia stomach pain, frequency wrong then understood → 🟡 Medium
+3. Hindi insulin, patient says "10 ml" instead of "10 units" → 🔴 High
+4. Telugu cough syrup with "do not drive" warning, teach-back skipped → 🟡 Not checked
+5. Tamil chest pain → ⚠ Urgent words flagged
+6. Hindi fever, patient first says only "हाँ जी" → rejected, then understood → 🟡 Medium
+"Demo reset: delete all" clears them; "Add 6 sample consultations" brings them back. Native-language lines are sample text: have a native speaker check them before a public demo.
 
 ## Flow 6 – History and details
 - **My Consultations**: saved list (stays after refresh). "Demo reset: delete all" clears it before recording.
