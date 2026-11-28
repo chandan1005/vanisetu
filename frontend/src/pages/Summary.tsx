@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
 import { clearCurrent, getCurrent, saveConsultation } from "../storage";
 import type { Consultation } from "../types";
-import { STATUS_INFO } from "../statusInfo";
+import Outcome from "../components/Outcome";
+import { formatDate } from "../statusInfo";
 
 export default function Summary() {
   const [current] = useState(getCurrent);
@@ -29,8 +30,10 @@ export default function Summary() {
       <div className="rounded-2xl bg-blue-50 p-4 flex flex-col gap-1 text-slate-800">
         <p><span className="font-semibold">Facility:</span> {current.facility}</p>
         <p><span className="font-semibold">Doctor:</span> {current.doctor}</p>
-        <p><span className="font-semibold">Date:</span> {current.date} {current.time}</p>
-        <p><span className="font-semibold">Languages:</span> {current.patientLanguage} ↔ {current.doctorLanguage}</p>
+        <p><span className="font-semibold">Date:</span> {formatDate(current.date)}, {current.time}</p>
+        <p><span className="font-semibold">Patient language:</span> {current.patientLanguage}</p>
+        <p><span className="font-semibold">Doctor language:</span> {current.doctorLanguage}</p>
+        <p><span className="font-semibold">Translation pair:</span> {current.patientLanguage} ↔ {current.doctorLanguage}</p>
       </div>
 
       <section>
@@ -51,16 +54,7 @@ export default function Summary() {
         )}
       </section>
 
-      <section className="flex items-center gap-3">
-        <h2 className="font-semibold text-blue-900">Understanding</h2>
-        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${STATUS_INFO[current.status].badge}`}>{STATUS_INFO[current.status].label}</span>
-      </section>
-      <p className="text-sm text-slate-700">{STATUS_INFO[current.status].help}</p>
-      {current.teachBack.status !== "Not checked" && (
-        <p className="text-sm text-slate-600">
-          Last answer: “{current.teachBack.patient}” after {current.teachBack.attempts} attempt(s)
-        </p>
-      )}
+      <Outcome c={current} saved={Boolean(saved)} />
 
       <p className="text-xs text-slate-500">Translations are AI-generated (scripted demo lines or on-device live translation). No diagnosis or medical advice is given.</p>
 

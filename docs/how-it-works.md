@@ -58,6 +58,12 @@ Speaking uses **one big button** and **automatic turns**, so the patient (often 
 - **Needs re-explaining** – the last answer did not match; explain again before the patient leaves.
 - **Not checked** – teach-back was skipped.
 
+## Communication risk (shown on Summary, Details and history)
+- 🟢 **Low** – understood the first time.
+- 🟡 **Medium** – understood after re-explaining, or teach-back skipped.
+- 🔴 **High** – last answer still did not match.
+It describes understanding only, never a medical assessment. "Why VANISETU flagged this" shows what the patient said, what was expected, what was missed and the reason.
+
 ## Flow 5 – Summary and save
 Facility, doctor, date/time, language pair, symptoms, confirmed instructions, Understanding status (Verified / Mismatch / Not checked), last answer and attempts. **Save consultation** → "Saved ✓ as C001" → **View My Consultations**.
 

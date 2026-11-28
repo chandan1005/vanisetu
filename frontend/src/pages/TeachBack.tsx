@@ -37,15 +37,17 @@ export default function TeachBack() {
   const instruction = current.instructions[current.instructions.length - 1] ?? "";
   const patient = findLanguage(current.patientLang ?? "hi");
 
-  function save(said: string, status: "Understood" | "Mismatch") {
+  // Saves the result, the missed details and every attempt, for the summary and history.
+  function save(said: string, status: "Understood" | "Mismatch", gaps: string[]) {
     const latest = getCurrent();
-    if (latest) {
-      setCurrent({
-        ...latest,
-        teachBack: { expected: expectedLabel, patient: said, status, attempts: attempt + 1 },
-        status: status === "Understood" ? "Verified" : "Mismatch",
-      });
-    }
+    if (!latest) return;
+    const totalDetails = isLive ? Math.max(1, expectedFacts.filter((f) => !f.startsWith("time:")).length) : 1;
+    const history = [...(latest.teachBack.history ?? []), { answer: said, status, missed: gaps }];
+    setCurrent({
+      ...latest,
+      teachBack: { expected: expectedLabel, patient: said, status, attempts: history.length, missed: gaps, totalDetails, history },
+      status: status === "Understood" ? "Verified" : "Mismatch",
+    });
   }
 
   // Checks the patient's answer: scripted rules for demo lines, fact comparison for live speech.
@@ -85,7 +87,7 @@ export default function TeachBack() {
     setResult(status);
     setExplained(false);
     setAttempt((a) => a + 1);
-    save(said, status);
+    save(said, status, gaps);
   }
 
   // Tap to listen to the patient; tap again to stop.

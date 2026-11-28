@@ -68,7 +68,7 @@ export default function Home() {
         <details className="w-full text-left text-xs text-slate-500">
           <summary className="cursor-pointer">About this demo</summary>
           <ul className="mt-2 list-disc pl-5 flex flex-col gap-1">
-            <li>{hasKey() ? "AI key set." : "AI key not set: no API keys are used. Sample (scripted) lines always work offline."}</li>
+            <li>{hasKey() ? "AI key set." : "Demo mode: no API keys are used (key not set). Sample lines always work offline."}</li>
             <li>{live ? "Live translation runs on this device in Chrome (free)." : "Live translation needs recent desktop Chrome."}</li>
             <li>All data is fictional and saved only in this browser.</li>
           </ul>

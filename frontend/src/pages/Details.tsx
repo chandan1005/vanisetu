@@ -4,7 +4,8 @@ import PageShell from "../components/PageShell";
 import { getConsultation } from "../storage";
 import { speakText, stopSpeaking } from "../speech";
 import { findLanguage } from "../languages";
-import { STATUS_INFO } from "../statusInfo";
+import { STATUS_INFO, consultationTitle, formatDate } from "../statusInfo";
+import Outcome from "../components/Outcome";
 
 export default function Details() {
   const { id = "" } = useParams();
@@ -42,17 +43,12 @@ export default function Details() {
   }
 
   return (
-    <PageShell title={`Consultation ${c.id}`} back="/history" backLabel="Back to My Consultations">
+    <PageShell title={consultationTitle(c.id)} back="/history" backLabel="Back to My Consultations">
       <div className="rounded-2xl bg-blue-50 p-4 flex flex-col gap-1 text-slate-800">
         <p><span className="font-semibold">Facility:</span> {c.facility}</p>
         <p><span className="font-semibold">Doctor:</span> {c.doctor}</p>
-        <p><span className="font-semibold">Date:</span> {c.date} {c.time}</p>
-        <p><span className="font-semibold">Languages:</span> {c.patientLanguage} ↔ {c.doctorLanguage}</p>
-        <p className="flex items-center gap-2">
-          <span className="font-semibold">Understanding:</span>
-          <span className={`rounded-full px-2 py-0.5 text-sm font-semibold ${info.badge}`}>{info.label}</span>
-        </p>
-        <p className="text-sm text-slate-600">{info.help}</p>
+        <p><span className="font-semibold">Date:</span> {formatDate(c.date)}, {c.time}</p>
+        <p><span className="font-semibold">Translation pair:</span> {c.patientLanguage} (patient) ↔ {c.doctorLanguage} (doctor)</p>
       </div>
 
       <div className="flex gap-2">
@@ -81,12 +77,7 @@ export default function Details() {
         <h2 className="font-semibold text-blue-900">Instructions</h2>
         <ul className="list-disc pl-5">{c.instructions.map((s) => <li key={s}>{s}</li>)}</ul>
       </section>
-      <section>
-        <h2 className="font-semibold text-blue-900">Teach-back</h2>
-        <p>Expected: {c.teachBack.expected || "—"}</p>
-        <p>Patient: {c.teachBack.patient || "—"}</p>
-        <p>Result: {c.teachBack.status}</p>
-      </section>
+      <Outcome c={c} saved />
       <section>
         <h2 className="font-semibold text-blue-900">Conversation</h2>
         <ul className="flex flex-col gap-2">

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
 import { clearAll, listConsultations } from "../storage";
-import { STATUS_INFO } from "../statusInfo";
+import { STATUS_INFO, communicationRisk, consultationTitle, formatDate } from "../statusInfo";
 
 export default function History() {
   const [items, setItems] = useState(listConsultations);
@@ -22,8 +22,10 @@ export default function History() {
         <ul className="flex flex-col gap-3">
           {items.map((c) => (
             <li key={c.id} className="rounded-2xl border border-slate-200 p-4 flex flex-col gap-1">
-              <p className="font-semibold text-blue-900">{c.facility}</p>
-              <p className="text-sm text-slate-600">{c.date} at {c.time} • {c.id}</p>
+              <p className="font-semibold text-blue-900">{consultationTitle(c.id)}</p>
+              <p className="text-sm text-slate-700">{c.facility}</p>
+              <p className="text-sm text-slate-600">{formatDate(c.date)}, {c.time} · {c.patientLanguage} ↔ {c.doctorLanguage}</p>
+              <p className="text-sm">{communicationRisk(c).dot} Communication risk: {communicationRisk(c).level}</p>
               <p className="text-sm flex items-center gap-2">
                 Understanding:
                 <span className={`rounded-full px-2 py-0.5 text-sm font-semibold ${STATUS_INFO[c.status].badge}`}>{STATUS_INFO[c.status].label}</span>

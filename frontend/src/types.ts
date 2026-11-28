@@ -9,11 +9,16 @@ export type Turn = {
   time: string;
 };
 
+export type TeachBackAttempt = { answer: string; status: "Understood" | "Mismatch"; missed: string[] };
+
 export type TeachBackResult = {
   expected: string;
   patient: string;
   status: "Understood" | "Mismatch" | "Not checked";
   attempts: number;
+  missed?: string[];
+  totalDetails?: number;
+  history?: TeachBackAttempt[];
 };
 
 export type Consultation = {

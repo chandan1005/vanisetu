@@ -54,5 +54,12 @@ Voice consultation prototype: patient and doctor speak different languages; conf
 - [x] "Send as patient / doctor" are now full-size buttons
 - [x] Home: technical "AI key not set" moved into "About this demo"; plain wording on the main screen
 
+## Final polish
+- [x] Summary and Details: Understanding status, Communication risk (Low/Medium/High), "x of y details repeated correctly", "Why VANISETU flagged this" (patient said / expected / missed / reason), timeline of every step
+- [x] My Consultations cards: "Consultation #001", facility, date (27 Nov 2026), language pair, communication risk, understanding
+- [x] Patient language / doctor language / translation pair shown on Summary
+- [x] docs/pitch-slide-text.md with the "Why not Google Translate?" slide
+- [x] Feature freeze: no more features before submission (no login, backend, GPS, WhatsApp, calls, dashboards)
+
 ## Last session
 Added language picker, live on-device translation, live safety check and live teach-back, Wispr Flow docs. Scripted and live flows tested end to end.
